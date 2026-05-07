@@ -1,0 +1,283 @@
+/* ===== 特殊样式 ===== */
+
+/* 隐藏类 */
+.hidden { display: none !important; }
+
+/* 历史日志模式提示 */
+.history-mode-banner {
+    background: var(--accent-light);
+    color: var(--accent-color);
+    padding: 8px 16px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-color);
+    display: none;
+}
+.history-mode-banner.show { display: block; }
+
+/* 图片上传和缩略图样式 */
+.image-thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    min-height: 10px;
+}
+
+.image-thumbnail-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--bg-color);
+}
+
+.image-thumbnail-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-thumbnail-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    background: #E76F51;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.image-thumbnail-delete:hover {
+    opacity: 1;
+}
+
+.image-upload-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+/* 局域网访问开关 */
+.lan-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.2);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--secondary-color);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* 时间显示 */
+.status-bar .current-time {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+    font-size: 15px;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(179, 68, 46, 0.6), 
+                 0 0 16px rgba(179, 68, 46, 0.4),
+                 0 0 24px rgba(179, 68, 46, 0.2);
+    position: relative;
+}
+
+/* ===== 彩蛋样式 ===== */
+
+.easter-egg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(29, 50, 79, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.easter-egg-overlay.show {
+    display: flex;
+}
+
+.easter-egg-box {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FEF7E4 100%);
+    border-radius: 20px;
+    padding: 50px 60px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(29, 50, 79, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.easter-egg-title {
+    font-size: 24pt;
+    font-weight: 700;
+    color: #1D324F;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    text-shadow: 
+        0 2px 4px rgba(29, 50, 79, 0.1),
+        0 4px 8px rgba(29, 50, 79, 0.05);
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+.easter-egg-content {
+    font-size: 14pt;
+    color: #5A5A5A;
+    line-height: 2;
+    margin-bottom: 30px;
+}
+
+.easter-egg-line {
+    margin: 15px 0;
+}
+
+.easter-egg-line.main {
+    font-size: 18pt;
+    font-weight: 600;
+    color: #B3442E;
+    text-shadow: 0 2px 4px rgba(179, 68, 46, 0.2);
+}
+
+.easter-egg-line.sub {
+    font-size: 13pt;
+    color: #8E959A;
+}
+
+.easter-egg-line.copyright {
+    font-size: 11pt;
+    color: #1D324F;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #E5E0D5;
+}
+
+.easter-egg-close {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #1D324F 0%, #2A4570 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 12pt;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.easter-egg-close:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29, 50, 79, 0.3);
+}
+
+/* 撒花粒子容器 */
+.confetti-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+    pointer-events: none;
+}
+
+/* 圆形粒子 */
+.confetti-circle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    opacity: 0;
+    background: currentColor;
+    box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.3);
+}
+
+/* 星星粒子 */
+.confetti-star {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    font-size: 16px;
+    line-height: 16px;
+}
+.confetti-star::before {
+    content: '⭐';
+}
+
+/* 圆形粒子动画 */
+.cc-1 { color: #FFD700; animation: confettiFall1 2.5s ease-out forwards; animation-delay: 0s; }
+.cc-2 { color: #FF6B6B; animation: confettiFall2 2.5s ease-out forwards; animation-delay: 0.1s; }
+.cc-3 { color: #4ECDC4; animation: confettiFall3 2.5s ease-out forwards; animation-delay: 0.15s; }
+.cc-4 { color: #FFE66D; animation: confettiFall4 2.5s ease-out forwards; animation-delay: 0.2s; }
+.cc-5 { color: #FF8E72; animation: confettiFall5 2.5s ease-out forwards; animation-delay: 0.25s; }
+.cc-6 { color: #B3442E; animation: confettiFall6 2.5s ease-out forwards; animation-delay: 0.3s; }
+
+/* 星星粒子动画 */
+.cs-1 { animation: confettiFall7 2.5s ease-out forwards; animation-delay: 0.35s; }
+.cs-2 { animation: confettiFall8 2.5s ease-out forwards; animation-delay: 0.4s; }
+.cs-3 { animation: confettiFall9 2.5s ease-out forwards; animation-delay: 0.45s; }
+.cs-4 { animation: confettiFall10 2.5s ease-out forwards; animation-delay: 0.5s; }
+.cs-5 { animation: confettiFall11 2.5s ease-out forwards; animation-delay: 0.55s; }
+.cs-6 { animation: confettiFall12 2.5s ease-out forwards; animation-delay: 0.6s; }

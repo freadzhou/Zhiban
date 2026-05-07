@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日志检查报告 - {{date_range_title}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+            font-size: 12pt;
+            color: #262626;
+            background: linear-gradient(135deg, #FEF7E4 0%, #FFFFFF 100%);
+            padding: 40px 50px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(29, 50, 79, 0.12);
+            padding: 30px 40px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #1D324F;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 24pt;
+            color: #1D324F;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            font-size: 14pt;
+            color: #8E959A;
+        }
+        .header .check-time {
+            font-size: 12pt;
+            color: #5A5A5A;
+            margin-top: 8px;
+        }
+        /* 状态横幅 - 动画效果 */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            background: var(--status-bg);
+            border: 2px solid var(--status-color);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: bannerAppear 0.5s ease-out forwards;
+        }
+        @keyframes bannerAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .status-banner .icon {
+            font-size: 28pt;
+            margin-right: 15px;
+            animation: iconPulse 1s ease-in-out;
+        }
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .status-banner .text {
+            font-size: 16pt;
+            font-weight: 600;
+            color: var(--status-color);
+        }
+        /* 统计卡片网格 - 动画效果 */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: #F8F3E8;
+            border-radius: 8px;
+            border: 1px solid #D5D0C5;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardAppear 0.4s ease-out forwards;
+        }
+        .summary-item:nth-child(1) { animation-delay: 0.1s; }
+        .summary-item:nth-child(2) { animation-delay: 0.2s; }
+        .summary-item:nth-child(3) { animation-delay: 0.3s; }
+        .summary-item:nth-child(4) { animation-delay: 0.4s; }
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .summary-item .value {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #1D324F;
+        }
+        .summary-item .label {
+            font-size: 11pt;
+            color: #8E959A;
+            margin-top: 5px;
+        }
+        .summary-item.warning .value { color: #B3442E; }
+        .summary-item.success .value { color: #3A7A3A; }
+        /* 数字计数动画 */
+        .summary-item .value {
+            animation: countUp 0.6s ease-out;
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* 内容区块 */
+        .section {
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: sectionFadeIn 0.5s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+        @keyframes sectionFadeIn {
+            to { opacity: 1; }
+        }
+        .section-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #1D324F;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #F8F3E8 0%, #FEF7E4 100%);
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .section-title.error { 
+            background: linear-gradient(135deg, #FFE8E8 0%, #FFF0F0 100%); 
+            color: #B3442E; 
+        }
+        .section-title.warning { 
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFF8F0 100%); 
+            color: #D4A373; 
+        }
+        .section-title.success {
+            background: linear-gradient(135deg, #D8F3DC 0%, #B7E4C7 100%);
+            color: #3A7A3A;
+        }
+        /* 问题列表 */
+        .issue-list {
+            padding: 0 15px;
+        }
+        .issue-item {
+            padding: 12px 15px;
+            background: #FEF7E4;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid #B3442E;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: issueSlideIn 0.3s ease-out forwards;
+        }
+        .issue-item:nth-child(1) { animation-delay: 0.6s; }
+        .issue-item:nth-child(2) { animation-delay: 0.7s; }
+        .issue-item:nth-child(3) { animation-delay: 0.8s; }
+        .issue-item:nth-child(4) { animation-delay: 0.9s; }
+        .issue-item:nth-child(5) { animation-delay: 1.0s; }
+        @keyframes issueSlideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .issue-item .date {
+            font-weight: 600;
+            color: #1D324F;
+            margin-bottom: 5px;
+        }
+        .issue-item .staff {
+            font-size: 11pt;
+            color: #1D324F;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .issue-item .problems {
+            padding-left: 15px;
+        }
+        .issue-item .problems li {
+            color: #5A5A5A;
+            margin-bottom: 3px;
+        }
+        /* 缺失文件标签 */
+        .missing-list {
+            padding: 0 15px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .missing-item {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #FFE8E8;
+            color: #B3442E;
+            border-radius: 6px;
+            margin: 5px;
+            font-weight: 500;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: tagPopIn 0.3s ease-out forwards;
+        }
+        .missing-item:nth-child(1) { animation-delay: 0.6s; }
+        .missing-item:nth-child(2) { animation-delay: 0.65s; }
+        .missing-item:nth-child(3) { animation-delay: 0.7s; }
+        .missing-item:nth-child(4) { animation-delay: 0.75s; }
+        .missing-item:nth-child(5) { animation-delay: 0.8s; }
+        .missing-item:nth-child(n+6) { animation-delay: 0.85s; }
+        @keyframes tagPopIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        /* 成功提示 */
+        .success-message {
+            text-align: center;
+            padding: 30px;
+            color: #3A7A3A;
+            font-size: 14pt;
+        }
+        .success-message .icon {
+            font-size: 48pt;
+            animation: successBounce 0.6s ease-out;
+        }
+        @keyframes successBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #D5D0C5;
+            color: #8E959A;
+            font-size: 10pt;
+            opacity: 0;
+            animation: footerFadeIn 0.5s ease-out forwards;
+            animation-delay: 1.2s;
+        }
+        @keyframes footerFadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ========== 打印样式 ========== */
+        @media print {
+            body {
+                background: #FFFFFF;
+                padding: 20px;
+            }
+            /* 取消动画，直接显示 */
+            .status-banner,
+            .summary-item,
+            .section,
+            .issue-item,
+            .missing-item,
+            .footer {
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+            .container {
+                box-shadow: none;
+                border: 1px solid #D5D0C5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 日志完整性检查报告</h1>
+            <div class="subtitle">检查范围：{{date_range_title}}</div>
+            <div class="check-time">检查时间：{{check_time}}</div>
+        </div>
+        
+        <div class="status-banner" style="--status-bg: linear-gradient(135deg, {{status_color}}15 0%, {{status_color}}08 100%); --status-color: {{status_color}};">
+            <span class="icon">{{status_icon}}</span>
+            <span class="text">{{status_text}}</span>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="value">{{total_checked}}</div>
+                <div class="label">检查总天数</div>
+            </div>
+            <div class="summary-item success">
+                <div class="value">{{complete_count}}</div>
+                <div class="label">完整日志</div>
+            </div>
+            <div class="summary-item warning" id="missingItem">
+                <div class="value">{{missing_count}}</div>
+                <div class="label">缺失日志</div>
+            </div>
+            <div class="summary-item warning" id="incompleteItem">
+                <div class="value">{{incomplete_count}}</div>
+                <div class="label">存在问题</div>
+            </div>
+        </div>
+
+        {{missing_section_html}}
+        {{incomplete_section_html}}
+        {{success_section_html}}
+
+        <div class="footer">
+            机坪管制室值班日志系统 - 自动生成报告
+        </div>
+    </div>
+
+    <script>
+        // 根据数值控制卡片显示
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果缺失数为0，隐藏缺失卡片
+            var missingCount = {{missing_count}};
+            var incompleteCount = {{incomplete_count}};
+            
+            if (missingCount === 0) {
+                document.getElementById('missingItem').style.display = 'none';
+            }
+            if (incompleteCount === 0) {
+                document.getElementById('incompleteItem').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

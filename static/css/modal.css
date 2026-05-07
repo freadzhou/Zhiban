@@ -1,0 +1,360 @@
+/* ===== 弹窗样式 ===== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(29, 50, 79, 0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: modalSlide 0.25s ease;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #F8F3E8 0%, #FEF7E4 100%);
+}
+
+.modal-header h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 0 4px;
+    line-height: 1;
+    transition: var(--transition);
+    border-radius: var(--radius-sm);
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+    background: var(--row-hover);
+}
+
+.modal-body { padding: 24px; }
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--header-bg);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* modal中的按钮样式 */
+.modal-footer .btn-secondary {
+    background: var(--secondary-light);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* 导出成功模态框 */
+.export-success-modal {
+    max-width: 480px !important;
+    padding: 40px 32px;
+    text-align: center;
+}
+
+.export-success-icon {
+    margin-bottom: 20px;
+}
+
+.export-success-icon svg {
+    animation: successPop 0.4s ease;
+}
+
+.success-circle {
+    stroke-dasharray: 63;
+    stroke-dashoffset: 63;
+    animation: circleIn 0.4s ease forwards 0.2s;
+}
+
+.success-check {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    animation: checkIn 0.3s ease forwards 0.5s;
+}
+
+.export-success-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #3A7A3A;
+    margin-bottom: 24px;
+}
+
+.export-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 24px;
+    font-size: 16px;
+}
+
+.export-stat-success {
+    color: #3A7A3A;
+    font-weight: 500;
+}
+
+.export-stat-success strong {
+    font-size: 20px;
+    margin: 0 4px;
+}
+
+.export-stat-failed {
+    color: #B3442E;
+    font-weight: 500;
+}
+
+.export-stat-failed strong {
+    font-size: 20px;
+    margin: 0 4px;
+}
+
+.export-path-box {
+    background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+    border: 2px solid #3A7A3A;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+}
+
+.export-path-label {
+    font-size: 14px;
+    color: #5A5A5A;
+    margin-bottom: 8px;
+}
+
+.export-path-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3A7A3A;
+    font-family: 'Consolas', 'Monaco', monospace;
+    word-break: break-all;
+}
+
+.export-failed-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: #B3442E;
+    margin-bottom: 12px;
+}
+
+.export-failed-list {
+    background: rgba(179, 68, 46, 0.08);
+    border: 1px solid rgba(179, 68, 46, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.export-failed-item {
+    font-size: 14px;
+    color: #B3442E;
+    margin-bottom: 4px;
+}
+
+/* 保存警告模态框 */
+.save-warning-modal {
+    max-width: 420px !important;
+    padding: 36px 28px;
+    text-align: center;
+}
+
+.save-warning-icon {
+    margin-bottom: 16px;
+}
+
+.save-warning-icon svg {
+    animation: warningPop 0.4s ease;
+}
+
+.warning-circle {
+    stroke-dasharray: 63;
+    stroke-dashoffset: 63;
+    animation: circleIn 0.4s ease forwards 0.2s;
+}
+
+.warning-line1 {
+    stroke-dasharray: 4;
+    stroke-dashoffset: 4;
+    animation: lineIn 0.2s ease forwards 0.5s;
+}
+
+.warning-dot {
+    opacity: 0;
+    animation: dotIn 0.2s ease forwards 0.6s;
+}
+
+@keyframes warningPop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes lineIn {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes dotIn {
+    to { opacity: 1; }
+}
+
+.save-warning-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #B3442E;
+    margin-bottom: 20px;
+}
+
+.save-warning-list {
+    background: rgba(179, 68, 46, 0.08);
+    border: 1px solid rgba(179, 68, 46, 0.2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.save-warning-item {
+    font-size: 15px;
+    color: #5A5A5A;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(179, 68, 46, 0.15);
+}
+
+.save-warning-item:last-child {
+    border-bottom: none;
+}
+
+.save-warning-item::before {
+    content: '• ';
+    color: #B3442E;
+    font-weight: bold;
+}
+
+.save-warning-note {
+    font-size: 13px;
+    color: #8E959A;
+    margin-bottom: 24px;
+}
+
+.save-warning-btn {
+    min-width: 140px;
+    padding: 10px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    justify-content: center;
+}
+
+.save-warning-text {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* 检查结果 */
+.check-result {
+    white-space: pre-wrap;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    background: var(--bg-color);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+
+/* 人员名单管理 */
+.staff-list {
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    background: var(--bg-color);
+}
+
+.staff-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(29, 50, 79, 0.08);
+    cursor: default;
+}
+
+.staff-item:last-child { border-bottom: none; margin-bottom: 0; }
+
+.staff-item:hover {
+    background: #E8E4DE;
+    box-shadow: 0 4px 12px rgba(29, 50, 79, 0.15), 0 2px 4px rgba(29, 50, 79, 0.1);
+    transform: translateY(-1px);
+    border-color: rgba(142, 149, 154, 0.3);
+}
+
+.staff-item .remove-btn {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.staff-item .remove-btn:hover {
+    background: var(--danger-light);
+}
+
+.add-staff-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}

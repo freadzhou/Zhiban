@@ -1,0 +1,83 @@
+/* ===== 主题变量定义 ===== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    /* 墨绿主题 - 现代清新风格 */
+    /* ===== 伦敦往事配色方案 ===== */
+    /* 主色系 - 深蓝色调，沉稳大气 */
+    --primary-color: #1D324F;       /* 深蓝 - 主色调 */
+    --primary-hover: #2A4570;       /* 中深蓝 - hover状态 */
+    --primary-active: #3A5890;      /* 亮蓝 - active状态 */
+    --primary-light: rgba(29, 50, 79, 0.08);
+    --primary-gradient: linear-gradient(135deg, #1D324F 0%, #262626 100%);
+    
+    /* 点缀色 - 红色，仅用于小元素 */
+    --accent-color: #B3442E;        /* 点睛红色 - 小元素点缀 */
+    --accent-light: rgba(179, 68, 46, 0.12);
+    --accent-hover: #A03A28;
+    
+    /* 辅助色 - 灰色系 */
+    --secondary-color: #8E959A;     /* 中灰 - 辅助元素 */
+    --secondary-light: rgba(142, 149, 154, 0.1);
+    
+    /* 背景色 - 米黄色，温暖柔和 */
+    --bg-color: #FEF7E4;            /* 米黄背景 */
+    --bg-pattern: radial-gradient(circle at 20% 50%, rgba(142, 149, 154, 0.04) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(29, 50, 79, 0.03) 0%, transparent 50%);
+    --card-bg: #FFFFFF;
+    --card-border: #E5E0D5;
+    
+    /* 文字色系 */
+    --text-primary: #262626;        /* 深黑 - 主文字 */
+    --text-secondary: #5A5A5A;      /* 中灰 - 次文字 */
+    --text-light: #8E959A;          /* 浅灰 - 辅助文字 */
+    
+    /* 边框色 */
+    --border-color: #D5D0C5;
+    --border-focus: #1D324F;
+    
+    /* 输入框 */
+    --input-bg: #FFFFFF;
+    --input-disabled: #F5F0E5;
+    
+    /* 表格相关 */
+    --header-bg: #F8F3E8;
+    --row-hover: #F5F0E5;
+    
+    /* 状态色 */
+    --success-color: #3A7A3A;       /* 成功绿 */
+    --success-light: rgba(58, 122, 58, 0.1);
+    --warning-color: #B3442E;       /* 红褐 - 警告 */
+    --warning-light: rgba(179, 68, 46, 0.12);
+    --danger-color: #B3442E;        /* 红色 - 危险 */
+    --danger-light: rgba(179, 68, 46, 0.1);
+    
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px 0 rgba(29, 50, 79, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(29, 50, 79, 0.08), 0 2px 4px -1px rgba(29, 50, 79, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(29, 50, 79, 0.1), 0 4px 6px -2px rgba(29, 50, 79, 0.05);
+    --shadow-focus: 0 0 0 3px rgba(179, 68, 46, 0.15);
+    --shadow-card: 0 2px 8px rgba(29, 50, 79, 0.08);
+    
+    /* 圆角 */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    
+    /* 过渡 */
+    --transition: all 0.25s ease;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    font-size: 14px;
+    background: var(--bg-color);
+    background-image: var(--bg-pattern);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}

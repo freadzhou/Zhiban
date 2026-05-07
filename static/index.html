@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机坪管制室值班日志系统</title>
+    <script src="html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/extras.css">
+</head>
+<body>
+
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+        <div class="toolbar-group">
+            <label>字体：</label>
+            <select id="fontFamily" onchange="changeFont()">
+                <option value="微软雅黑">微软雅黑</option>
+                <option value="宋体">宋体</option>
+                <option value="黑体">黑体</option>
+                <option value="楷体">楷体</option>
+            </select>
+        </div>
+        <div class="toolbar-group" style="background: transparent; padding: 0;">
+            <button class="btn btn-primary" onclick="saveLog()">💾 保存日志</button>
+            <!-- 历史模式下隐藏的按钮组 -->
+            <div id="toolbarNormalButtons">
+                <button class="btn btn-secondary" onclick="openHistoryLog()">📂 历史日志</button>
+                <button class="btn btn-secondary" onclick="batchExportPDF()">📄 批量导出PDF</button>
+                <button class="btn btn-secondary" onclick="checkLogs()">✅ 批量检查</button>
+                <button class="btn btn-secondary" onclick="openStaffConfig()"><svg style="width:16px;height:16px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M12 14c-6 0-8 3-8 6v1h16v-1c0-3-2-6-8-6z"/></svg>人员配置</button>
+                <button class="btn btn-secondary" onclick="openTaizhangDialog()">📊 生成台账</button>
+                <button class="btn btn-secondary" onclick="openMonthlyReportDialog()">📋 生成月报</button>
+                <div class="toolbar-divider"></div>
+                <div class="lan-toggle">
+                    <span>局域网访问</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="lanAccessToggle" data-skip-modified="true" onchange="toggleLanAccess(this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <!-- 历史模式醒目提示（默认隐藏） -->
+            <div id="historyModeAlert" class="history-mode-alert" style="display: none;">
+                ⚠️ 注意！当前为历史日志界面
+            </div>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <div class="save-indicator saved" id="saveIndicator">
+            <span class="pulse saved"></span>
+            <span>已保存</span>
+        </div>
+    </div>
+
+    <!-- 历史模式提示 -->
+    <div class="history-mode-banner" id="historyBanner">📅 正在编辑历史日志 - 日期可修改</div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 日期信息 -->
+        <div class="card" style="padding: 16px 20px;">
+            <div class="form-row" style="margin-bottom: 0;">
+                <label>日期：</label>
+                <input type="date" id="logDate" class="form-control" readonly style="background: var(--input-disabled); cursor: default; font-weight: 600; color: var(--primary-color);">
+                <span id="dateWarning" class="date-warning hidden" onclick="switchToToday()">⚠️ 非当天日志！点击切换</span>
+            </div>
+        </div>
+
+        <!-- 交接班信息 -->
+        <div class="card">
+            <div class="card-title">交接班信息</div>
+            <div class="form-row">
+                <label>交班人：</label>
+                <div class="multi-select" id="handoverFrom">
+                    <div class="multi-select-trigger" onclick="toggleDropdown('handoverFrom')">
+                        <span class="placeholder">请选择</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown"></div>
+                </div>
+                <label>接班人：</label>
+                <div class="multi-select" id="handoverTo">
+                    <div class="multi-select-trigger" onclick="toggleDropdown('handoverTo')">
+                        <span class="placeholder">请选择</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>交接时间：</label>
+                <input type="time" id="timeFrom" class="form-control" value="00:00">
+                <span style="color: var(--text-light);">至</span>
+                <input type="time" id="timeTo" class="form-control" value="00:00">
+            </div>
+        </div>
+
+        <!-- 计划停机与设备故障 -->
+        <div class="card">
+            <div class="form-row">
+                <label>计划停机：</label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="planShutdown" value="无" checked> 无</label>
+                    <label class="radio-item"><input type="radio" name="planShutdown" value="有"> 有</label>
+                </div>
+                <input type="text" id="planDetail" class="form-control" placeholder="具体情况..." style="flex:1;">
+            </div>
+            <div class="form-row" style="margin-bottom: 0;">
+                <label>设备故障：</label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="equipmentFault" value="无" checked> 无</label>
+                    <label class="radio-item"><input type="radio" name="equipmentFault" value="有"> 有</label>
+                </div>
+                <input type="text" id="faultDetail" class="form-control" placeholder="具体情况..." style="flex:1;">
+            </div>
+        </div>
+
+        <!-- 设备监控 -->
+        <div class="card">
+            <div class="card-title">设备监控检查</div>
+            <div class="table-container">
+                <table id="equipmentTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">序号</th>
+                            <th style="min-width:130px;">设备名称</th>
+                            <th>10:00</th>
+                            <th>14:00</th>
+                            <th>18:00</th>
+                            <th>22:00</th>
+                            <th>次日06:00</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div style="margin-top: 14px;">
+                <div class="form-row" style="margin-bottom: 0;">
+                    <label>监控故障描述：</label>
+                    <input type="text" id="monitorNote" class="form-control" placeholder="故障描述信息..." style="flex:1;">
+                    <input type="file" id="monitorImages" multiple accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleImageUpload(this, 'monitorImagesContainer', '监控故障图片')">
+                    <button class="btn btn-upload" onclick="document.getElementById('monitorImages').click()" style="margin-left: 10px;">📎 上传图片</button>
+                </div>
+                <div id="monitorImagesContainer" class="image-thumbnails-container"></div>
+            </div>
+        </div>
+
+        <!-- 联系记录 -->
+        <div class="card">
+            <div class="card-title">机坪联系记录</div>
+            <div class="table-container contact-table">
+                <table id="contactTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>时间</th>
+                            <th>所属系统</th>
+                            <th>联系类型</th>
+                            <th>事由</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <button class="btn btn-add" onclick="addContactRow()">➕ 添加联系记录</button>
+        </div>
+
+        <!-- 应急处置 -->
+        <div class="card">
+            <div class="card-title">应急处置</div>
+            <div class="form-row">
+                <label>应急情况：</label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="emergency" value="无" checked> 无应急情况</label>
+                    <label class="radio-item"><input type="radio" name="emergency" value="有"> 有应急情况</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <label style="min-width: auto;">
+                    <input type="checkbox" id="emergencyReport" style="accent-color: var(--primary-color);"> 电话通报机坪管制
+                </label>
+            </div>
+            <div class="form-row">
+                <label>1、应急措施：</label>
+                <textarea id="emergencyMeasures" class="form-control" placeholder="具体措施..." style="flex:1;"></textarea>
+            </div>
+            <div class="form-row">
+                <label>2、后续通报：</label>
+                <textarea id="emergencyReportTo" class="form-control" placeholder="具体对象..." style="flex:1;"></textarea>
+            </div>
+            <div class="form-row">
+                <label style="min-width: auto;">
+                    <input type="checkbox" id="receivedReport" style="accent-color: var(--primary-color);"> 接到机坪管制通报
+                </label>
+            </div>
+            <div class="form-row" style="margin-bottom: 0;">
+                <label>其他：</label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="otherEmergency" value="无" checked> 无</label>
+                    <label class="radio-item"><input type="radio" name="otherEmergency" value="有"> 有</label>
+                </div>
+                <input type="text" id="otherDetail" class="form-control" placeholder="具体情况..." style="flex:1;">
+            </div>
+        </div>
+
+        <!-- 其他故障与审核 -->
+        <div class="card">
+            <div>
+                <div class="form-row" style="margin-bottom: 0;">
+                    <label>其他故障：</label>
+                    <textarea id="generalNote" class="form-control" style="flex:1;"></textarea>
+                    <input type="file" id="generalImages" multiple accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleImageUpload(this, 'generalImagesContainer', '其他故障图片')">
+                    <button class="btn btn-upload" onclick="document.getElementById('generalImages').click()" style="margin-left: 10px; align-self: flex-start;">📎 上传图片</button>
+                </div>
+                <div id="generalImagesContainer" class="image-thumbnails-container"></div>
+            </div>
+            <div class="form-row">
+                <label>故障处置：</label>
+                <textarea id="faultRecord" class="form-control" style="flex:1;"></textarea>
+            </div>
+            <div class="form-row" style="margin-bottom: 0;">
+                <label>审核人：</label>
+                <div class="multi-select dropup" id="auditor">
+                    <div class="multi-select-trigger" onclick="toggleDropdown('auditor')">
+                        <span class="placeholder">请选择</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown"></div>
+                </div>
+                <label>审核日期：</label>
+                <input type="date" id="auditDate" class="form-control" readonly style="background: var(--input-disabled); color: var(--primary-color); font-weight: 600;">
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部状态栏 -->
+    <div class="status-bar">
+        <span class="copyright" onclick="showEasterEgg()">机坪管制室值班日志系统 — By Fread.Z</span>
+        <span class="current-time" id="currentTime"></span>
+    </div>
+    
+    <!-- 彩蛋弹窗 -->
+    <div class="easter-egg-overlay" id="easterEggModal">
+        <div class="easter-egg-box">
+            <div class="confetti-container">
+                <!-- 圆形粒子（带渐变光泽） -->
+                <div class="confetti-circle cc-1"></div>
+                <div class="confetti-circle cc-2"></div>
+                <div class="confetti-circle cc-3"></div>
+                <div class="confetti-circle cc-4"></div>
+                <div class="confetti-circle cc-5"></div>
+                <div class="confetti-circle cc-6"></div>
+                <!-- 星星粒子 -->
+                <div class="confetti-star cs-1"></div>
+                <div class="confetti-star cs-2"></div>
+                <div class="confetti-star cs-3"></div>
+                <div class="confetti-star cs-4"></div>
+                <div class="confetti-star cs-5"></div>
+                <div class="confetti-star cs-6"></div>
+            </div>
+            <div class="easter-egg-title">🎉 感谢使用本系统！</div>
+            <div class="easter-egg-content">
+                <div class="easter-egg-line main">愿您工作顺利，万事如意！</div>
+                <div class="easter-egg-line sub">如有问题，请联系系统管理员</div>
+                <div class="easter-egg-line copyright">Copyright © 2026 Fread.Z</div>
+            </div>
+            <button class="easter-egg-close" onclick="closeEasterEgg()">知道了</button>
+        </div>
+    </div>
+
+    <!-- PDF 生成专用 iframe - 最可靠的渲染方式 -->
+    <!-- html2canvas 在隐藏/视口外元素上有兼容性问题，使用 iframe 可确保正确渲染 -->
+    <iframe id="pdf-render-iframe" style="position: fixed; left: -9999px; top: 0; width: 1200px; height: 900px; border: none; background: white;"></iframe>
+    <!-- 备用 div 容器（某些情况下可能需要） -->
+    <div id="pdf-render-container" style="display: none;"></div>
+
+    <!-- 模态框：人员名单配置 -->
+    <div class="modal-overlay" id="staffModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>👥 人员名单配置</h3>
+                <button class="modal-close" onclick="closeModal('staffModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="staff-list" id="staffListContainer"></div>
+                <div class="add-staff-row">
+                    <input type="text" id="newStaffName" class="form-control" placeholder="输入姓名后回车">
+                    <button class="btn btn-success" onclick="addStaff()">添加</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('staffModal')">取消</button>
+                <button class="btn btn-success" onclick="saveStaffConfig()">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：批量导出PDF -->
+    <div class="modal-overlay" id="pdfModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📄 批量导出PDF</h3>
+                <button class="modal-close" onclick="closeModal('pdfModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label>开始日期：</label>
+                    <input type="date" id="pdfStartDate" class="form-control">
+                </div>
+                <div class="form-row">
+                    <label>结束日期：</label>
+                    <input type="date" id="pdfEndDate" class="form-control">
+                </div>
+                <div id="pdfProgress" style="margin-top: 16px; display: none;">
+                    <div style="background: var(--bg-color); border-radius: 10px; height: 24px; overflow: hidden; border: 1px solid var(--border-color);">
+                        <div id="pdfProgressBar" style="background: var(--primary-gradient); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="pdfProgressText" style="text-align: center; margin-top: 8px; font-size: 13px; color: var(--text-secondary);"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('pdfModal')">关闭</button>
+                <button class="btn btn-success" onclick="startBatchPDF()">开始导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：导出成功提示 -->
+    <div class="modal-overlay" id="exportSuccessModal">
+        <div class="modal export-success-modal">
+            <div class="export-success-icon">
+                <svg viewBox="0 0 24 24" width="80" height="80">
+                    <circle cx="12" cy="12" r="10" fill="#3A7A3A" opacity="0.15"/>
+                    <circle cx="12" cy="12" r="10" stroke="#3A7A3A" stroke-width="2" fill="none" class="success-circle"/>
+                    <path d="M8 12 L11 15 L16 9" stroke="#3A7A3A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="success-check"/>
+                </svg>
+            </div>
+            <h2 class="export-success-title">导出完成</h2>
+            <div class="export-stats">
+                <span class="export-stat-success">✓ 成功：<strong id="exportSuccessCount">0</strong> 个</span>
+                <span class="export-stat-failed">✗ 失败：<strong id="exportFailedCount">0</strong> 个</span>
+            </div>
+            <div id="exportFailedReasons" style="display: none;">
+                <div class="export-failed-header">失败详情：</div>
+                <div class="export-failed-list" id="exportFailedList"></div>
+            </div>
+            <div class="export-path-box">
+                <div class="export-path-label">📁 PDF 文件保存位置</div>
+                <div class="export-path-value" id="exportPathValue">Report\DutyLog_PDF</div>
+            </div>
+            <button class="btn btn-success export-success-btn" onclick="closeModal('exportSuccessModal')">我知道了</button>
+        </div>
+    </div>
+
+    <!-- 模态框：保存提示 -->
+    <div class="modal-overlay" id="saveWarningModal">
+        <div class="modal save-warning-modal">
+            <div class="save-warning-icon">
+                <svg viewBox="0 0 24 24" width="64" height="64">
+                    <circle cx="12" cy="12" r="10" fill="#B3442E" opacity="0.15"/>
+                    <circle cx="12" cy="12" r="10" stroke="#B3442E" stroke-width="2" fill="none" class="warning-circle"/>
+                    <path d="M12 8 L12 12" stroke="#B3442E" stroke-width="2.5" fill="none" stroke-linecap="round" class="warning-line1"/>
+                    <circle cx="12" cy="16" r="1" fill="#B3442E" class="warning-dot"/>
+                </svg>
+            </div>
+            <h2 class="save-warning-title">保存提示</h2>
+            <div class="save-warning-list" id="saveWarningList"></div>
+            <div class="save-warning-note">数据仍将保存，请后续补充完善。</div>
+            <button class="btn btn-primary save-warning-btn" onclick="closeModal('saveWarningModal')">我知道了</button>
+        </div>
+    </div>
+
+    <!-- 模态框：批量检查日志 -->
+    <div class="modal-overlay" id="checkModal">
+        <div class="modal" style="max-width: 640px;">
+            <div class="modal-header">
+                <h3>✅ 批量检查日志</h3>
+                <button class="modal-close" onclick="closeModal('checkModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label>开始日期：</label>
+                    <input type="date" id="checkStartDate" class="form-control">
+                </div>
+                <div class="form-row">
+                    <label>结束日期：</label>
+                    <input type="date" id="checkEndDate" class="form-control">
+                </div>
+                <div id="checkProgress" style="margin-top: 16px; display: none;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="checkProgressBar" style="width: 0;"></div>
+                    </div>
+                    <div class="progress-text" id="checkProgressText">准备检查...</div>
+                </div>
+                <div id="checkResult" style="margin-top: 16px; display: none;">
+                    <div class="check-result" id="checkResultContent"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('checkModal')">关闭</button>
+                <button class="btn btn-success" onclick="startCheckLogs()">开始检查</button>
+                <button class="btn btn-success" id="openCheckReportBtn" style="display: none;" onclick="openCheckReport()">📄 打开检查报告</button>
+            </div>
+        </div>
+    </div>
+  
+    <!-- 模态框：历史日志选择 -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal" style="max-width: 640px;">
+            <div class="modal-header">
+                <h3>📂 打开历史日志</h3>
+                <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 快速跳转 -->
+                <div class="form-row" style="margin-bottom: 16px; padding: 12px; background: var(--bg-color); border-radius: var(--radius-sm);">
+                    <label style="min-width: 80px;">日期跳转：</label>
+                    <input type="date" id="historyDateJump" class="form-control" style="flex:1;">
+                    <button class="btn btn-success" onclick="jumpToDate()">打开</button>
+                </div>
+                
+                <!-- 本地文件选择 -->
+                <div class="form-row" style="margin-bottom: 16px; padding: 12px; background: var(--accent-light); border-radius: var(--radius-sm); border: 2px dashed var(--accent-color);">
+                    <label style="min-width: 80px; color: var(--accent-color); font-weight: 600;">本地文件：</label>
+                    <input type="file" id="localFileInput" accept=".json" style="display:none;" onchange="handleLocalFile(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('localFileInput').click()" style="flex:1; color: var(--text-secondary);">📁 选择本地日志文件 (.json)</button>
+                </div>
+                <div style="margin-top: -8px; margin-bottom: 12px; padding: 0 12px;">
+                    <span style="font-size: 12px; color: var(--text-light);">💡 提示：日志文件位于程序目录下的 <strong>Log_Stor\年份\月份\</strong> 文件夹中</span>
+                </div>
+                
+                <!-- 日志列表 -->
+                <div style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: 600; color: var(--text-secondary);">服务器日志列表：</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="historyYearFilter" class="form-control" style="width: 80px; padding: 4px 8px;" onchange="filterHistoryList()">
+                                <option value="">全部年份</option>
+                            </select>
+                            <select id="historyMonthFilter" class="form-control" style="width: 80px; padding: 4px 8px;" onchange="filterHistoryList()">
+                                <option value="">全部月份</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="historyList" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-color);"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('historyModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+        <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+            font-size: 12pt;
+            color: #262626;
+            background: linear-gradient(135deg, #FEF7E4 0%, #FFFFFF 100%);
+            padding: 40px 50px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24pt;
+            color: #1D324F;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 12pt;
+            color: #8E959A;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E5E0D5;
+        }
+        .chart-section {
+            margin: 30px 0;
+            padding: 25px 30px;
+            background: #FFFFFF;
+            border: 1px solid #E5E0D5;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(29, 50, 79, 0.08);
+        }
+        .chart-title {
+            font-size: 16pt;
+            font-weight: 600;
+            color: #1D324F;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #B3442E;
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px 0;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            height: 32px;
+        }
+        .bar-label {
+            width: 140px;
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1D324F;
+            text-align: right;
+            padding-right: 12px;
+            letter-spacing: 0.5px;
+        }
+        .bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            background: rgba(29, 50, 79, 0.04);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .bar {
+            height: 22px;
+            width: 0;
+            background: linear-gradient(135deg, #1D324F 0%, #3A5890 100%);
+            border-radius: 6px;
+            min-width: 2px;
+            box-shadow: 0 2px 6px rgba(29, 50, 79, 0.15);
+            position: relative;
+            animation: barGrow 0.6s ease-out forwards;
+        }
+        @keyframes barGrow {
+            from { width: 0; }
+            to { width: var(--bar-width); }
+        }
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+            border-radius: 6px;
+        }
+        .bar-value {
+            width: 60px;
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1D324F;
+            padding-left: 10px;
+        }
+        .bar-value.highlight {
+            color: #B3442E;
+        }
+        .month-section {
+            margin: 35px 0;
+            page-break-inside: avoid;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(29, 50, 79, 0.08);
+            overflow: hidden;
+        }
+        .month-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #1D324F;
+            background: linear-gradient(135deg, #FEF7E4 0%, #F8F3E8 100%);
+            padding: 12px 20px;
+            border-bottom: 2px solid #E5E0D5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .month-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(180deg, #B3442E 0%, #D05A40 100%);
+            border-radius: 2px;
+        }
+        .month-content {
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 10pt;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(29, 50, 79, 0.1);
+        }
+        th, td {
+            border: 1px solid rgba(29, 50, 79, 0.2);
+            padding: 12px 14px;
+            text-align: center;
+        }
+        th {
+            background: linear-gradient(135deg, #1D324F 0%, #2A4570 100%);
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+        tr:nth-child(even) td {
+            background: rgba(29, 50, 79, 0.03);
+        }
+        tr:hover td {
+            background: rgba(179, 68, 46, 0.05);
+        }
+        .type-report {
+            color: #B3442E;
+            font-weight: 500;
+        }
+        .type-result {
+            color: #3A7A3A;
+            font-weight: 500;
+        }
+        /* 事由列样式 - 截断显示 */
+        .reason-cell {
+            max-width: 300px;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+        }
+        .reason-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            transition: color 0.2s;
+        }
+        /* 完整内容 - 打印时显示 */
+        .reason-full {
+            display: none;
+        }
+        .reason-cell:hover .reason-text {
+            color: #B3442E;
+        }
+        .reason-cell::after {
+            content: '🔍';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10pt;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .reason-cell:hover::after {
+            opacity: 0.6;
+        }
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(29, 50, 79, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 25px 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(29, 50, 79, 0.3);
+        }
+        .modal-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #1D324F;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #E5E0D5;
+        }
+        .modal-content {
+            font-size: 11pt;
+            color: #262626;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .modal-close {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1D324F 0%, #2A4570 100%);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-size: 11pt;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .modal-close:hover {
+            transform: translateY(-2px);
+        }
+        .summary {
+            margin-top: 35px;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #FEF7E4 0%, #FFFFFF 100%);
+            border: 2px solid #B3442E;
+            border-radius: 12px;
+            font-size: 12pt;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .summary-icon {
+            font-size: 24pt;
+        }
+        .summary-content {
+            flex: 1;
+        }
+        .summary strong {
+            color: #B3442E;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 10pt;
+            color: #8E959A;
+            padding-top: 20px;
+            border-top: 1px solid #E5E0D5;
+        }
+        .no-data {
+            text-align: center;
+            color: #8E959A;
+            padding: 30px;
+            font-size: 11pt;
+        }
+
+        /* ========== 打印样式 ========== */
+        @media print {
+            /* 页面背景改为白色 */
+            body {
+                background: #FFFFFF;
+                padding: 20px;
+            }
+            /* 隐藏弹窗 */
+            .modal-overlay {
+                display: none !important;
+            }
+            /* 隐藏事由单元格的放大镜图标和悬浮效果 */
+            .reason-cell::after {
+                display: none !important;
+            }
+            .reason-cell:hover .reason-text {
+                color: inherit;
+            }
+            tr:hover td {
+                background: transparent;
+            }
+            /* 打印时：隐藏截断文本，显示完整内容 */
+            .reason-text {
+                display: none !important;
+            }
+            .reason-full {
+                display: block !important;
+                white-space: normal;
+                word-break: break-word;
+                text-align: left;
+            }
+            /* 阴影和圆角在打印时简化 */
+            .chart-section, .month-section, .summary {
+                box-shadow: none;
+                border: 1px solid #E5E0D5;
+            }
+            table {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 为每个柱状条添加延迟动画
+        document.addEventListener('DOMContentLoaded', function() {
+            var bars = document.querySelectorAll('.bar');
+            bars.forEach(function(bar, index) {
+                bar.style.animationDelay = (index * 0.05) + 's';
+            });
+        });
+        
+        // 显示事由详情弹窗
+        function showReasonModal(title, content) {
+            var overlay = document.getElementById('reasonModal');
+            var modalTitle = document.getElementById('modalTitle');
+            var modalContent = document.getElementById('modalContent');
+            modalTitle.textContent = title;
+            modalContent.textContent = content;
+            overlay.classList.add('show');
+        }
+        
+        // 关闭弹窗
+        function closeReasonModal() {
+            var overlay = document.getElementById('reasonModal');
+            overlay.classList.remove('show');
+        }
+        
+        // 点击弹窗外部关闭
+        document.addEventListener('click', function(e) {
+            var overlay = document.getElementById('reasonModal');
+            if (e.target === overlay) {
+                closeReasonModal();
+            }
+        });
+    </script>
+
+    <!-- 弹窗结构 -->
+    <div class="modal-overlay" id="reasonModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">事由详情</div>
+            <div class="modal-content" id="modalContent"></div>
+            <button class="modal-close" onclick="closeReasonModal()">关闭</button>
+        </div>
+    </div>
+
+    <h1>{{title}}</h1>
+    <div class="subtitle">机坪管制室值班日志系统 · 自动生成报告</div>
+    
+    <div class="chart-section">
+        <div class="chart-title">📊 各系统故障统计</div>
+        <div class="bar-chart">
+{{bar_chart_html}}
+        </div>
+    </div>
+    
+{{month_sections_html}}
+    
+    <div class="summary">
+        <div class="summary-icon">📈</div>
+        <div class="summary-content">
+            本期共发生故障 <strong>{{total_faults}}</strong> 次，
+            涉及 <strong>{{systems_with_faults}}</strong> 个系统。
+        </div>
+    </div>
+    
+    <div class="footer">
+        报告生成时间：{{report_time}} · 机坪管制室值班日志系统
+    </div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+/* ===== 动画定义 ===== */
+
+/* 基础动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes alertBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* 下拉菜单动画 */
+@keyframes dropdownSlide {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropupSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 成功图标动画 */
+@keyframes successPop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes circleIn {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes checkIn {
+    to { stroke-dashoffset: 0; }
+}
+
+/* 警告动画 */
+@keyframes warningPop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes lineIn {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes dotIn {
+    to { opacity: 1; }
+}
+
+/* Modal动画 */
+@keyframes modalSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 标题发光动画 */
+@keyframes titleGlow {
+    0%, 100% { 
+        text-shadow: 0 0 10px rgba(179, 68, 46, 0.8), 0 0 20px rgba(179, 68, 46, 0.4);
+    }
+    50% { 
+        text-shadow: 0 0 20px rgba(179, 68, 46, 1), 0 0 40px rgba(179, 68, 46, 0.6), 0 0 60px rgba(179, 68, 46, 0.3);
+    }
+}
+
+/* 彩蛋彩纸动画 - 从中心向外爆发 */
+@keyframes confettiFall1 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 10%; left: 15%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(720deg); }
+}
+@keyframes confettiFall2 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 5%; left: 85%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-540deg); }
+}
+@keyframes confettiFall3 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 15%; left: 5%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+}
+@keyframes confettiFall4 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 20%; left: 90%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-720deg); }
+}
+@keyframes confettiFall5 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 25%; left: 20%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(540deg); }
+}
+@keyframes confettiFall6 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 35%; left: 80%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-360deg); }
+}
+@keyframes confettiFall7 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 40%; left: 30%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(720deg); }
+}
+@keyframes confettiFall8 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 45%; left: 70%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-540deg); }
+}
+@keyframes confettiFall9 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 10%; left: 40%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+}
+@keyframes confettiFall10 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 25%; left: 60%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-720deg); }
+}
+@keyframes confettiFall11 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    100% { top: 50%; left: 10%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(540deg); }
+}
+@keyframes confettiFall12 {
+    0% { top: 50%; left: 50%; opacity: 1; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    20% { transform: translate(-50%, -50%) scale(1) rotate(-180deg); }
+    100% { top: 55%; left: 90%; opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-360deg); }
+}
